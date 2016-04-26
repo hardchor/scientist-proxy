@@ -7,7 +7,8 @@
     "mb:start": "mb start --allowInjection &> /dev/null &",
     "mb:stop": "mb stop",
     "mb:create-imposters": "babel-node tasks/createImposters",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint tasks/"
   },
   "repository": {
     "type": "git",
