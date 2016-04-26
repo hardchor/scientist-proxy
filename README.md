@@ -3,13 +3,22 @@
 A proxy server that helps upgrading old APIs.
 
 
-## Ideas
+## Install
 
-* receive request
-* proxy to old API
-* proxy to new API
-* compare old and new response
-* return old response
+```bash
+npm i
+```
+
+## Run
+
+```bash
+npm run mb:start
+npm run mb:create-imposters
+
+# when you're done
+
+npm run mb:stop
+```
 
 
 ## Architecture
