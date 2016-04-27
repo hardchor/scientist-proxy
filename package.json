@@ -7,10 +7,11 @@
     "node": "5.10.1"
   },
   "scripts": {
+    "start": "npm run mb:start && npm run mb:create-imposters && babel-node src/server.js && npm run stop",
+    "test": "jest --config .jestrc src/",
     "mb:start": "mb start --allowInjection &> /dev/null &",
     "mb:stop": "mb stop",
     "mb:create-imposters": "babel-node tasks/createImposters",
-    "test": "jest --config .jestrc src/",
     "lint": "eslint tasks/ src/"
   },
   "repository": {
@@ -24,7 +25,8 @@
   },
   "homepage": "https://github.com/hardchor/scientist-proxy",
   "dependencies": {
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "request": "^2.72.0"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",
