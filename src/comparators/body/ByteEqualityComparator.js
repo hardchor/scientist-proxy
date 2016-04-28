@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 import { BufferedTransformStream } from 'BufferedTransformStream';
 
-class BaseComparator extends EventEmitter {
+class ByteEqualityComparator extends EventEmitter {
   
   left = new BufferedTransformStream()
 
@@ -14,17 +14,13 @@ class BaseComparator extends EventEmitter {
     this._bindStreamEvents();
   }
 
-  _bindStreamEvents()
-  {
+  _bindStreamEvents() {
     this.left.on('end', this._onStreamEnd.bind(this, this.left));
-    this.right.on('right', this._onStreamEnd.bind(this, this.right));
+    this.right.on('end', this._onStreamEnd.bind(this, this.right));
   }
 
   _onStreamEnd(stream) {
-
-    // TODO Is still applicable?! 
-    // https://github.com/nodejs/node-v0.x-archive/blob/v0.11.11/lib/_stream_writable.js#L60-L63
-    if (this.left.ended && this.right.ended)
+    if (this.left.hasEnded && this.right.hasEnded)
     {
       this._checkEquality();
       this.emit('end');
@@ -38,4 +34,4 @@ class BaseComparator extends EventEmitter {
   }
 }
 
-export default RightStream;
+export default ByteEqualityComparator ;
