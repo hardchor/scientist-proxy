@@ -38,7 +38,9 @@ class RecordingTransformer extends Transform {
     // TODO: could just throw an event - does the comparator want to record headers itself?
     this.headers[name] = value;
 
-    this.dest && this.dest.setHeader(name, value);
+    if (this.dest) {
+      this.dest.setHeader(name, value);
+    }
   }
 
   _transform(chunk, encoding, next) {
@@ -59,7 +61,9 @@ class RecordingTransformer extends Transform {
     this.hasEnded = true;
     this.emit('end', chunk);
 
-    this.dest && this.dest.end();
+    if (this.dest) {
+      this.dest.end();
+    }
   }
 }
 
