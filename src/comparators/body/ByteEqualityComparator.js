@@ -1,46 +1,43 @@
 const EventEmitter = require('events');
 
-import { BufferedTransformStream } from 'BufferedTransformStream';
+import RecordingTransformer from '../../stream/RecordingTransformer';
 
 class ByteEqualityComparator extends EventEmitter {
-  
-  left = new BufferedTransformStream()
 
-  right = new BufferedTransformStream()
+  control = new RecordingTransformer('control')
+
+  candidate = new RecordingTransformer('candidate')
 
   constructor(...args) {
     super(...args);
 
-    this._bindStreamEvents();
+    this.bindStreamEvents();
   }
 
-  _bindStreamEvents() {
-    this.left.on('end', this._onStreamEnd.bind(this, this.left));
-    this.right.on('end', this._onStreamEnd.bind(this, this.right));
+  bindStreamEvents() {
+    this.control.on('end', () => this.onStreamEnd());
+    this.candidate.on('end', () => this.onStreamEnd());
   }
 
-  _onStreamEnd(stream) {
-    if (this.left.hasEnded && this.right.hasEnded)
-    {
-      this._checkEquality();
+  onStreamEnd() {
+    if (this.control.hasEnded && this.candidate.hasEnded) {
+      this.checkEquality();
       this.emit('end');
     }
   }
 
-  _checkEquality()
-  {
-    let leftItr = this.left.eachByte();
-    let rightItr = this.right.eachByte();
+  checkEquality() {
+    const controlItr = this.control.eachByte();
+    const candidateItr = this.candidate.eachByte();
     let missmatch = false;
 
-    function compareNext()
-    {
-      let leftResult = leftItr.next();
-      let rightResult = rightItr.next();
+    function compareNext() {
+      const controlResult = controlItr.next();
+      const candidateResult = candidateItr.next();
 
-      missmatch = leftResult.value !== rightResult.value;
+      missmatch = controlResult.value !== candidateResult.value;
 
-      return missmatch || leftResult.done || rightResult.done;
+      return missmatch || controlResult.done || candidateResult.done;
     }
 
     while (!compareNext());
