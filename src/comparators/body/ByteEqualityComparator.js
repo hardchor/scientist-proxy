@@ -29,8 +29,23 @@ class ByteEqualityComparator extends EventEmitter {
 
   _checkEquality()
   {
-    // TODO Extend this guy
-    // TODO Now we deal in chucks str1 === str2 no longer works. Iterate chunks to check for equality
+    let leftItr = this.left.eachByte();
+    let rightItr = this.right.eachByte();
+    let missmatch = false;
+
+    function compareNext()
+    {
+      let leftResult = leftItr.next();
+      let rightResult = rightItr.next();
+
+      missmatch = leftResult.value !== rightResult.value;
+
+      return missmatch || leftResult.done || rightResult.done;
+    }
+
+    while (!compareNext());
+
+    // TODO Do something with `missmatch`
   }
 }
 
