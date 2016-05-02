@@ -2,9 +2,9 @@ import ByteEqualityComparator from '../ByteEqualityComparator';
 import RecordingTransformer from '../../../stream/RecordingTransformer';
 
 jest.unmock('../ByteEqualityComparator');
+jest.unmock('../../BaseComparator');
 jest.unmock('../../../stream/RecordingTransformer');
 jest.unmock('invariant');
-jest.unmock('stream');
 
 describe('ByteEqualityComparator', () => {
 

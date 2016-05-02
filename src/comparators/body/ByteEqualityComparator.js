@@ -1,9 +1,9 @@
-const EventEmitter = require('events');
 const invariant = require('invariant');
 
+import BaseComparator from '../BaseComparator';
 import RecordingTransformer from '../../stream/RecordingTransformer';
 
-class ByteEqualityComparator extends EventEmitter {
+class ByteEqualityComparator extends BaseComparator {
 
   /**
    * @type {RecordingTransformer}
@@ -18,34 +18,10 @@ class ByteEqualityComparator extends EventEmitter {
   _candidateRecorder = null
 
   /**
-   * @type {stream.Readable}
-   * @private
-   */
-  _control = null
-
-  /**
-   * @type {stream.Readable}
-   * @private
-   */
-  _candidate = null
-
-  /**
    * @type {Set}
    * @private
    */
   _completedStreams = new Set()
-
-  /**
-   * @type {boolean}
-   * @protected
-   */
-  _finalized = false
-
-  /**
-   * @type {boolean}
-   * @protected
-   */
-  _match = false
 
   constructor(controlRecorder, candidateRecorder, ...args) {
     super(...args);
@@ -57,20 +33,20 @@ class ByteEqualityComparator extends EventEmitter {
   }
 
   /**
+   * @override
    * @param stream
    */
-  setControl(stream) {
-    invariant(this._control === null, "Control must not be set more than once");
-    this._control = stream;
+  setControl(stream, ...args) {
+    super.setControl(stream, ...args);
     this._control.pipe(this._controlRecorder);
   }
 
   /**
+   * @override
    * @param stream
    */
-  setCandidate(stream) {
-    invariant(this._control === null, "Candidate must not be set more than once");
-    this._candidate = stream;
+  setCandidate(stream, ...args) {
+  super.setCandidate(stream, ...args);
     this._candidate.pipe(this._candidateRecorder);
   }
   
@@ -91,21 +67,6 @@ class ByteEqualityComparator extends EventEmitter {
 
       this.emit('end');
     }
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  get finalized() {
-    return this._finalized;
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  get match() {
-    invariant(this._finalized, "Must be called post finalization");
-    return this._match;
   }
 
   /**

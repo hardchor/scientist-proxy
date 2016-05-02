@@ -3,7 +3,7 @@ import http from 'http';
 import request from 'request';
 import config from '../config';
 import debug from 'debug';
-import ResponseComparator from './comparators/ResponseComparator';
+import ResponseComparator from './comparators/AutowiredResponseComparator';
 // import RecordingTransformer from './stream/RecordingTransformer';
 
 const log = debug('app');
