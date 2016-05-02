@@ -65,6 +65,15 @@ class RecordingTransformer extends Transform {
       this.dest.end();
     }
   }
+
+  *[Symbol.iterator]() {
+    for (let chunk of this.chunks) {
+      for (let char of chunk) {
+        yield char;
+      }
+    }
+  }
+
 }
 
 export default RecordingTransformer;

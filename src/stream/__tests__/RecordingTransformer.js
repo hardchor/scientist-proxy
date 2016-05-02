@@ -1,9 +1,11 @@
 /* eslint no-underscore-dangle:0 */
+
 import RecordingTransformer from '../RecordingTransformer';
 
 jest.unmock('../RecordingTransformer');
 
 describe('RecordingTransformer', () => {
+
   let mockConsumer;
   let recordingTransformer;
 
@@ -75,6 +77,29 @@ describe('RecordingTransformer', () => {
       recordingTransformer.end();
 
       expect(mockConsumer.end).toBeCalled();
+    });
+  });
+
+  describe('Symbol.iterator', () => {
+    it('yields each byte in all chunks', () => {
+      recordingTransformer.chunks = ['abc', 'defg', 'hi'];
+
+      const itr = recordingTransformer[Symbol.iterator]();
+      let results = [];
+      let item;
+
+      while (true) {
+        item = itr.next();
+        if (item.done) {
+          break;
+        }
+        else {
+          results.push(item.value);
+        }
+      }
+
+      expect(results).toEqual([ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i' ]);
+
     });
   });
 });
