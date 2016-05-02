@@ -2,15 +2,15 @@ const EventEmitter = require('events');
 
 import RecordingTransformer from '../stream/RecordingTransformer';
 
-class RootComparator extends EventEmitter {
+class ResponseComparator extends EventEmitter {
 
   control = new RecordingTransformer('control');
 
   candidate = new RecordingTransformer('candidate');
 
-  headerComparator;
-  bodyComparator;
-  statusCodeComparator;
+  statusCodeComparator; // = SomeDefaultComparator()
+  headerComparator; // = SomeDefaultComparator()
+  bodyComparator; // = SomeDefaultComparator()
 
   constructor(...args) {
     super(...args);
@@ -20,16 +20,6 @@ class RootComparator extends EventEmitter {
 
   bindStreamEvents() {
     this.control.on('header', () => this.onControlHeader());
-
-    this.control.on('end', () => this.onStreamEnd());
-    this.candidate.on('end', () => this.onStreamEnd());
-  }
-
-  onStreamEnd() {
-    if (this.control.hasEnded && this.candidate.hasEnded) {
-      this.checkEquality();
-      this.emit('end');
-    }
   }
 
   onControlHeader(name, value) {
@@ -40,4 +30,4 @@ class RootComparator extends EventEmitter {
   }
 }
 
-export default RootComparator ;
+export default ResponseComparator;

@@ -3,14 +3,15 @@ import http from 'http';
 import request from 'request';
 import config from '../config';
 import debug from 'debug';
-import RecordingTransformer from './stream/RecordingTransformer';
+import ResponseComparator from './comparators/ResponseComparator';
+// import RecordingTransformer from './stream/RecordingTransformer';
 
 const log = debug('app');
 const { oldApiEndpoint, newApiEndpoint } = config;
 
 const server = http.createServer((req, res) => {
-  const control = new RecordingTransformer('control');
-  const candidate = new RecordingTransformer('candidate');
+  const comparator = new ResponseComparator();
+  const { control, candidate } = comparator;
 
   // TODO: add X-Forwarded-For headers etc.
   // control
