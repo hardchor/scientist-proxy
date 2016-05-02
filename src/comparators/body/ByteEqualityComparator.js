@@ -7,13 +7,27 @@ class ByteEqualityComparator extends EventEmitter {
 
   /**
    * @type {RecordingTransformer}
+   * @protected
    */
-  control = new RecordingTransformer('control')
+  _controlRecorder = null
 
   /**
    * @type {RecordingTransformer}
+   * @protected
    */
-  candidate = new RecordingTransformer('candidate')
+  _candidateRecorder = null
+
+  /**
+   * @type {stream.Readable}
+   * @private
+   */
+  _control = null
+
+  /**
+   * @type {stream.Readable}
+   * @private
+   */
+  _candidate = null
 
   /**
    * @type {Set}
@@ -33,18 +47,39 @@ class ByteEqualityComparator extends EventEmitter {
    */
   _match = false
 
-  constructor(...args) {
+  constructor(controlRecorder, candidateRecorder, ...args) {
     super(...args);
 
-    this.bindStreamEvents();
+    this._controlRecorder = controlRecorder || new RecordingTransformer('controlRecorder');
+    this._candidateRecorder = candidateRecorder || new RecordingTransformer('candidateRecorder');
+
+    this._bindStreamEvents();
   }
 
-  bindStreamEvents() {
-    this.control.on('end', () => this.onStreamEnd(this.control));
-    this.candidate.on('end', () => this.onStreamEnd(this.candidate));
+  /**
+   * @param stream
+   */
+  setControl(stream) {
+    invariant(this._control === null, "Control must not be set more than once");
+    this._control = stream;
+    this._control.pipe(this._controlRecorder);
   }
 
-  onStreamEnd(stream) {
+  /**
+   * @param stream
+   */
+  setCandidate(stream) {
+    invariant(this._control === null, "Candidate must not be set more than once");
+    this._candidate = stream;
+    this._candidate.pipe(this._candidateRecorder);
+  }
+  
+  _bindStreamEvents() {
+    this._controlRecorder.on('end', () => this._onStreamEnd(this._controlRecorder));
+    this._candidateRecorder.on('end', () => this._onStreamEnd(this._candidateRecorder));
+  }
+
+  _onStreamEnd(stream) {
     this._completedStreams.add(stream);
 
     if (this._completedStreams.size === 2) {
@@ -77,17 +112,17 @@ class ByteEqualityComparator extends EventEmitter {
    * @protected
    */
   _checkEquality() {
-    const controlItr = this.control[Symbol.iterator]();
-    const candidateItr = this.candidate[Symbol.iterator]();
+    const _controlRecorderItr = this._controlRecorder[Symbol.iterator]();
+    const _candidateRecorderItr = this._candidateRecorder[Symbol.iterator]();
     let missmatch = false;
 
     function compareNext() {
-      const controlResult = controlItr.next();
-      const candidateResult = candidateItr.next();
+      const _controlRecorderResult = _controlRecorderItr.next();
+      const _candidateRecorderResult = _candidateRecorderItr.next();
 
-      missmatch = controlResult.value !== candidateResult.value;
+      missmatch = _controlRecorderResult.value !== _candidateRecorderResult.value;
 
-      return missmatch || controlResult.done || candidateResult.done;
+      return missmatch || _controlRecorderResult.done || _candidateRecorderResult.done;
     }
 
     while (!compareNext());
