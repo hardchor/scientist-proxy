@@ -23,7 +23,6 @@ const oldApi = {
           is: {
             statusCode: 200,
             headers: {
-              Accept: 'application/json',
               'Access-Control-Allow-Origin': 'www.test-url.com',
             },
             body: JSON.stringify({
@@ -59,7 +58,6 @@ const newApi = {
           is: {
             statusCode: 200,
             headers: {
-              Accept: 'application/json',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
