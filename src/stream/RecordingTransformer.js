@@ -35,6 +35,7 @@ class RecordingTransformer extends Transform {
 
   setHeader(name, value) {
     this.log('setHeader', name, value);
+    this.emit('header', name, value);
     // TODO: could just throw an event - does the comparator want to record headers itself?
     this.headers[name] = value;
 
