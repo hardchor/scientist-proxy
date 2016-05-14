@@ -75,6 +75,14 @@ class RecordingTransformer extends Transform {
     }
   }
 
+  /**
+   * @returns {string}
+   */
+  toString()
+  {
+    return this.chunks.join("");
+  }
+
 }
 
 export default RecordingTransformer;
