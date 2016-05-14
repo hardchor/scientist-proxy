@@ -1,15 +1,26 @@
 import ByteEqualityComparator from '../ByteEqualityComparator';
+import RecordingTransformer from '../../../stream/RecordingTransformer';
 
 jest.unmock('../ByteEqualityComparator');
+jest.unmock('../../BaseComparator');
 jest.unmock('../../../stream/RecordingTransformer');
 jest.unmock('invariant');
 
 describe('ByteEqualityComparator', () => {
 
   var subject;
+  var controlRecorder;
+  var candidateRecorder;
 
   beforeEach(() => {
-    subject = new ByteEqualityComparator();
+
+    controlRecorder = new RecordingTransformer('controlRecorder')
+    candidateRecorder = new RecordingTransformer('candidateRecorder')
+
+    subject = new ByteEqualityComparator(
+      controlRecorder,
+      candidateRecorder
+    );
   });
 
   describe('finalised property', () => {
@@ -19,13 +30,13 @@ describe('ByteEqualityComparator', () => {
     });
 
     it('is false after only one', () => {
-      subject.control.emit('end');
+      controlRecorder.emit('end');
       expect(subject.finalized).toBe(false);
     });
 
     it('is false after only one', () => {
-      subject.control.emit('end');
-      subject.candidate.emit('end');
+      controlRecorder.emit('end');
+      candidateRecorder.emit('end');
       expect(subject.finalized).toBe(true);
     });
 
@@ -40,19 +51,19 @@ describe('ByteEqualityComparator', () => {
     });
 
     it('is true if the subject streams match', () => {
-      subject.control.chunks = ['abc', 'defg'];
-      subject.control.emit('end');
-      subject.candidate.chunks = ['abc', 'defg'];
-      subject.candidate.emit('end');
+      controlRecorder.chunks = ['abc', 'defg'];
+      controlRecorder.emit('end');
+      candidateRecorder.chunks = ['abc', 'defg'];
+      candidateRecorder.emit('end');
 
       expect(subject.match).toBe(true);
     });
 
     it('is false if the subject streams match', () => {
-      subject.control.chunks = ['abc', 'defg'];
-      subject.control.emit('end');
-      subject.candidate.chunks = ['cba', 'defg'];
-      subject.candidate.emit('end');
+      controlRecorder.chunks = ['abc', 'defg'];
+      controlRecorder.emit('end');
+      candidateRecorder.chunks = ['cba', 'defg'];
+      candidateRecorder.emit('end');
 
       expect(subject.match).toBe(false);
     });
@@ -65,10 +76,10 @@ describe('ByteEqualityComparator', () => {
       let spy = jest.fn();
       subject.on('end', spy);
 
-      subject.control.emit('end');
+      controlRecorder.emit('end');
       expect(spy).not.toBeCalled();
 
-      subject.candidate.emit('end');
+      candidateRecorder.emit('end');
       expect(spy).toBeCalled();
 
     });

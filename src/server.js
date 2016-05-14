@@ -3,27 +3,29 @@ import http from 'http';
 import request from 'request';
 import config from '../config';
 import debug from 'debug';
+import ResponseComparator from './comparators/AutowiredResponseComparator';
 import RecordingTransformer from './stream/RecordingTransformer';
 
 const log = debug('app');
 const { oldApiEndpoint, newApiEndpoint } = config;
 
 const server = http.createServer((req, res) => {
-  const control = new RecordingTransformer('control');
-  const candidate = new RecordingTransformer('candidate');
+  const controlRecorder = new RecordingTransformer('control');
+  const candidateRecorder = new RecordingTransformer('candidate');
+  const comparator = new ResponseComparator(controlRecorder, candidateRecorder);
 
   // TODO: add X-Forwarded-For headers etc.
   // control
   req
     .pipe(request(oldApiEndpoint + req.url))
-    .pipe(control)
+    .pipe(controlRecorder)
     .pipe(res)
   ;
 
   // candidate
   req
     .pipe(request(newApiEndpoint + req.url))
-    .pipe(candidate)
+    .pipe(candidateRecorder)
   ;
 });
 
