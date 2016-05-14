@@ -15,7 +15,10 @@ class ByteEqualityComparator extends BaseBufferedComparator {
       const controlRecorderResult = controlRecorderItr.next();
       const candidateRecorderResult = candidateRecorderItr.next();
 
-      missMatch = controlRecorderResult.value !== candidateRecorderResult.value;
+      // Set missMatch true if there is value inequality
+      // or one stream has ended while the other hasn't.
+      missMatch = (controlRecorderResult.value !== candidateRecorderResult.value) ||
+        (controlRecorderResult.done !== candidateRecorderResult.done);
 
       return missMatch || controlRecorderResult.done || candidateRecorderResult.done;
     }

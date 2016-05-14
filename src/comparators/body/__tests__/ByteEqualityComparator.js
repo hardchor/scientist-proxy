@@ -44,6 +44,15 @@ describe('ByteEqualityComparator', () => {
       expect(subject.match).toBe(false);
     });
 
+    it('is false if the streams are different lengths', () => {
+      controlRecorder.chunks = ['abc', 'defg'];
+      controlRecorder.emit('end');
+      candidateRecorder.chunks = ['abc', 'def'];
+      candidateRecorder.emit('end');
+
+      expect(subject.match).toBe(false);
+    });
+
   });
 
 });
