@@ -102,4 +102,13 @@ describe('RecordingTransformer', () => {
 
     });
   });
+
+  describe('toString', () => {
+    it('returns a string containing all chunks', () => {
+      recordingTransformer.chunks = ['abc', 'defg', 'hi'];
+
+      expect(recordingTransformer.toString()).toEqual('abcdefghi');
+
+    });
+  });
 });
